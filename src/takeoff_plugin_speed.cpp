@@ -68,7 +68,7 @@ namespace takeoff_plugins
             geometry_msgs::msg::TwistStamped msg;
             msg.header.stamp = node_ptr_->now();
             msg.header.frame_id = "enu";
-            msg.twist.linear.z = desired_speed_;
+            msg.twist.linear.z = 0;
             twist_pub_->publish(msg);
             return true;
         }
