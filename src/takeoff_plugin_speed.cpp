@@ -27,7 +27,7 @@ namespace takeoff_plugins
             return rclcpp_action::CancelResponse::ACCEPT;
         }
 
-        void onExecute(const std::shared_ptr<GoalHandleTakeoff> goal_handle) override
+        bool onExecute(const std::shared_ptr<GoalHandleTakeoff> goal_handle) override
         {
             rclcpp::Rate loop_rate(10);
             const auto goal = goal_handle->get_goal();
@@ -44,7 +44,7 @@ namespace takeoff_plugins
                     RCLCPP_INFO(node_ptr_->get_logger(), "Goal canceled");
                     // TODO: change this to hover
 
-                    return;
+                    return false;
                 }
 
                 geometry_msgs::msg::TwistStamped msg;
@@ -61,7 +61,6 @@ namespace takeoff_plugins
             }
 
             result->takeoff_success = true;
-
             goal_handle->succeed(result);
             RCLCPP_INFO(node_ptr_->get_logger(), "Goal succeeded");
             // TODO: change this to hover
@@ -71,6 +70,7 @@ namespace takeoff_plugins
             msg.header.frame_id = "enu";
             msg.twist.linear.z = desired_speed_;
             twist_pub_->publish(msg);
+            return true;
         }
 
     private:
