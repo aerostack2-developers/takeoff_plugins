@@ -26,7 +26,7 @@ set(PROJECT_DEPENDENCIES
   nav_msgs
   as2_core
   as2_msgs
-  trajectory_msgs
+  geometry_msgs
 )
 
 foreach(DEPENDENCY ${PROJECT_DEPENDENCIES})

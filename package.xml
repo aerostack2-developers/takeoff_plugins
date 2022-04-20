@@ -16,7 +16,7 @@
   <depend>nav_msgs</depend>
   <depend>as2_core</depend>
   <depend>as2_msgs</depend>
-  <depend>trajectory_msgs</depend>
+  <depend>geometry_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
