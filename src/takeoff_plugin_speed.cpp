@@ -1,19 +1,10 @@
 #include "takeoff_base.hpp"
-#include "geometry_msgs/msg/twist_stamped.hpp"
-#include "trajectory_msgs/msg/joint_trajectory_point.hpp"
+#include "as2_motion_command_handlers/speed_motion.hpp"
 
 namespace takeoff_plugins
 {
     class TakeOffSpeed : public takeoff_base::TakeOffBase
     {
-    private:
-        void ownInit(as2::Node *node_ptr)
-        {
-            twist_pub_ = node_ptr_->create_publisher<geometry_msgs::msg::TwistStamped>(
-                node_ptr_->generate_global_name(as2_names::topics::motion_reference::twist), 
-                as2_names::topics::motion_reference::qos);
-        }
-
     public:
         rclcpp_action::GoalResponse onAccepted(const std::shared_ptr<const as2_msgs::action::TakeOff::Goal> goal) override
         {
@@ -34,6 +25,8 @@ namespace takeoff_plugins
             auto feedback = std::make_shared<as2_msgs::action::TakeOff::Feedback>();
             auto result = std::make_shared<as2_msgs::action::TakeOff::Result>();
 
+            static as2::motionCommandsHandlers::SpeedMotion motion_handler(node_ptr_);
+
             // Check if goal is done
             while ((desired_height_ - actual_heigth_) > 0 + this->takeoff_height_threshold_)
             {
@@ -43,15 +36,11 @@ namespace takeoff_plugins
                     goal_handle->canceled(result);
                     RCLCPP_INFO(node_ptr_->get_logger(), "Goal canceled");
                     // TODO: change this to hover
-
+                    motion_handler.sendSpeedCommandWithYawSpeed(0.0, 0.0, 0.0, 0.0);
                     return false;
                 }
 
-                geometry_msgs::msg::TwistStamped msg;
-                msg.header.stamp = node_ptr_->now();
-                msg.header.frame_id = "enu";
-                msg.twist.linear.z = desired_speed_;
-                twist_pub_->publish(msg);
+                motion_handler.sendSpeedCommandWithYawSpeed(0.0, 0.0, desired_speed_, 0.0);
 
                 feedback->actual_takeoff_height = actual_heigth_;
                 feedback->actual_takeoff_speed = actual_z_speed_;
@@ -64,17 +53,9 @@ namespace takeoff_plugins
             goal_handle->succeed(result);
             RCLCPP_INFO(node_ptr_->get_logger(), "Goal succeeded");
             // TODO: change this to hover
-
-            geometry_msgs::msg::TwistStamped msg;
-            msg.header.stamp = node_ptr_->now();
-            msg.header.frame_id = "enu";
-            msg.twist.linear.z = 0;
-            twist_pub_->publish(msg);
+            motion_handler.sendSpeedCommandWithYawSpeed(0.0, 0.0, 0.0, 0.0);
             return true;
         }
-
-    private:
-        rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
     }; // TakeOffSpeed class
 } // takeoff_plugins namespace
 
