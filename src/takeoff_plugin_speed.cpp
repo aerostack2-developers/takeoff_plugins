@@ -1,5 +1,5 @@
+#include "motion_reference_handlers/speed_motion.hpp"
 #include "takeoff_base.hpp"
-#include "as2_motion_command_handlers/speed_motion.hpp"
 
 namespace takeoff_plugins
 {
@@ -25,7 +25,7 @@ namespace takeoff_plugins
             auto feedback = std::make_shared<as2_msgs::action::TakeOff::Feedback>();
             auto result = std::make_shared<as2_msgs::action::TakeOff::Result>();
 
-            static as2::motionCommandsHandlers::SpeedMotion motion_handler(node_ptr_);
+            static as2::motionReferenceHandlers::SpeedMotion motion_handler(node_ptr_);
 
             // Check if goal is done
             while ((desired_height_ - actual_heigth_) > 0 + this->takeoff_height_threshold_)
