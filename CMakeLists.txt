@@ -1,19 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-project(takeoff_plugins)
+set(PROJECT_NAME takeoff_plugins)
+project(${PROJECT_NAME} VERSION 0.1.0)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
-# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
-
-# if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#   add_compile_options(-Wall -Wextra -Wpedantic)
-# endif()
 
 # find dependencies
 set(PROJECT_DEPENDENCIES
@@ -34,19 +25,19 @@ foreach(DEPENDENCY ${PROJECT_DEPENDENCIES})
   find_package(${DEPENDENCY} REQUIRED)
 endforeach()
 
-add_library(takeoff_plugins src/takeoff_plugin_speed.cpp)
-target_include_directories(takeoff_plugins PUBLIC
+add_library(${PROJECT_NAME} src/takeoff_plugin_speed.cpp)
+target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(
-  takeoff_plugins
+  ${PROJECT_NAME}
   ${PROJECT_DEPENDENCIES}
 )
 
 pluginlib_export_plugin_description_file(takeoff_plugin_base plugins.xml)
 
 install(
-  TARGETS takeoff_plugins
+  TARGETS ${PROJECT_NAME}
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -54,7 +45,7 @@ install(
 )
 
 ament_export_libraries(
-  takeoff_plugins
+  ${PROJECT_NAME}
 )
 ament_export_targets(
   export_${PROJECT_NAME}
