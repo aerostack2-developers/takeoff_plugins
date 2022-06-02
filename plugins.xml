@@ -2,4 +2,7 @@
   <class type="takeoff_plugin_speed::Plugin" base_class_type="takeoff_base::TakeOffBase">
     <description>Takeoff done with speed commands.</description>
   </class>
+  <class type="takeoff_plugin_position::Plugin" base_class_type="takeoff_base::TakeOffBase">
+    <description>Takeoff done with position commands.</description>
+  </class>
 </library>
