@@ -1,5 +1,5 @@
 <library path="takeoff_plugins">
-  <class type="takeoff_plugins::TakeOffSpeed" base_class_type="takeoff_base::TakeOffBase">
+  <class type="takeoff_plugin_speed::Plugin" base_class_type="takeoff_base::TakeOffBase">
     <description>Takeoff done with speed commands.</description>
   </class>
 </library>

@@ -37,9 +37,9 @@
 #include "motion_reference_handlers/speed_motion.hpp"
 #include "takeoff_base.hpp"
 
-namespace takeoff_plugins
+namespace takeoff_plugin_speed
 {
-    class TakeOffSpeed : public takeoff_base::TakeOffBase
+    class Plugin : public takeoff_base::TakeOffBase
     {
     public:
         rclcpp_action::GoalResponse onAccepted(const std::shared_ptr<const as2_msgs::action::TakeOff::Goal> goal) override
@@ -92,9 +92,9 @@ namespace takeoff_plugins
             motion_handler.sendSpeedCommandWithYawSpeed(0.0, 0.0, 0.0, 0.0);
             return true;
         }
-    }; // TakeOffSpeed class
-} // takeoff_plugins namespace
+    }; // Plugin class
+} // takeoff_plugin_speed namespace
 
 #include <pluginlib/class_list_macros.hpp>
 
-PLUGINLIB_EXPORT_CLASS(takeoff_plugins::TakeOffSpeed, takeoff_base::TakeOffBase)
+PLUGINLIB_EXPORT_CLASS(takeoff_plugin_speed::Plugin, takeoff_base::TakeOffBase)
