@@ -25,7 +25,7 @@ foreach(DEPENDENCY ${PROJECT_DEPENDENCIES})
   find_package(${DEPENDENCY} REQUIRED)
 endforeach()
 
-add_library(${PROJECT_NAME} src/takeoff_plugin_speed.cpp)
+add_library(${PROJECT_NAME} src/takeoff_plugin_speed.cpp src/takeoff_plugin_position.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)

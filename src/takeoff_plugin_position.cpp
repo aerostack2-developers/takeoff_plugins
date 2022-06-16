@@ -1,6 +1,6 @@
 /*!*******************************************************************************************
- *  \file       takeoff_plugin_speed.cpp
- *  \brief      Plugin for takeoff with speed control
+ *  \file       takeoff_plugin_position.cpp
+ *  \brief      Plugin for takeoff with position control
  *  \authors    Miguel Fernández Cortizas
  *              Pedro Arias Pérez
  *              David Pérez Saura
@@ -11,7 +11,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -20,7 +20,7 @@
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -35,10 +35,10 @@
  ********************************************************************************/
 
 #include "motion_reference_handlers/hover_motion.hpp"
-#include "motion_reference_handlers/speed_motion.hpp"
+#include "motion_reference_handlers/position_motion.hpp"
 #include "takeoff_base.hpp"
 
-namespace takeoff_plugin_speed
+namespace takeoff_plugin_position
 {
     class Plugin : public takeoff_base::TakeOffBase
     {
@@ -63,7 +63,7 @@ namespace takeoff_plugin_speed
             auto feedback = std::make_shared<as2_msgs::action::TakeOff::Feedback>();
             auto result = std::make_shared<as2_msgs::action::TakeOff::Result>();
 
-            static as2::motionReferenceHandlers::SpeedMotion motion_handler_speed(node_ptr_);
+            static as2::motionReferenceHandlers::PositionMotion motion_handler_speed(node_ptr_);
             static as2::motionReferenceHandlers::HoverMotion motion_handler_hover(node_ptr_);
 
             while (!odom_received_)
@@ -80,7 +80,13 @@ namespace takeoff_plugin_speed
             }
 
             desired_height_ += actual_heigth_;
-            
+
+            pose_mutex_.lock();
+            float desired_pos_x = actual_position_.x();
+            float desired_pos_y = actual_position_.y();
+            float desired_yaw = as2::FrameUtils::getYawFromQuaternion(actual_q_);
+            pose_mutex_.unlock();
+
             // Check if goal is done
             while (!checkGoalCondition())
             {
@@ -89,12 +95,11 @@ namespace takeoff_plugin_speed
                     result->takeoff_success = false;
                     goal_handle->canceled(result);
                     RCLCPP_WARN(node_ptr_->get_logger(), "Goal canceled");
-                    // TODO: change this to hover
-                    motion_handler_speed.sendSpeedCommandWithYawSpeed(0.0, 0.0, 0.0, 0.0);
+                    motion_handler_hover.sendHover();
                     return false;
                 }
 
-                motion_handler_speed.sendSpeedCommandWithYawSpeed(0.0, 0.0, desired_speed_, 0.0);
+                motion_handler_speed.sendPositionCommandWithYawAngle(desired_pos_x, desired_pos_y, desired_height_, desired_yaw, desired_speed_, desired_speed_, desired_speed_);
 
                 feedback->actual_takeoff_height = actual_heigth_;
                 feedback->actual_takeoff_speed = actual_z_speed_;
@@ -106,13 +111,14 @@ namespace takeoff_plugin_speed
             result->takeoff_success = true;
             goal_handle->succeed(result);
             RCLCPP_INFO(node_ptr_->get_logger(), "Goal succeeded");
-            motion_handler_hover.sendHover();
+            // TODO: change this to hover?
+            motion_handler_speed.sendPositionCommandWithYawAngle(desired_pos_x, desired_pos_y, desired_height_, desired_yaw, desired_speed_, desired_speed_, desired_speed_);
             return true;
         }
 
     }; // Plugin class
-} // takeoff_plugin_speed namespace
+} // takeoff_plugin_position namespace
 
 #include <pluginlib/class_list_macros.hpp>
 
-PLUGINLIB_EXPORT_CLASS(takeoff_plugin_speed::Plugin, takeoff_base::TakeOffBase)
+PLUGINLIB_EXPORT_CLASS(takeoff_plugin_position::Plugin, takeoff_base::TakeOffBase)
