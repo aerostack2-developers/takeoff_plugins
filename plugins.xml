@@ -5,4 +5,7 @@
   <class type="takeoff_plugin_position::Plugin" base_class_type="takeoff_base::TakeOffBase">
     <description>Takeoff done with position commands.</description>
   </class>
+  <class type="takeoff_plugin_platform::Plugin" base_class_type="takeoff_base::TakeOffBase">
+    <description>Takeoff done with platform.</description>
+  </class>
 </library>
